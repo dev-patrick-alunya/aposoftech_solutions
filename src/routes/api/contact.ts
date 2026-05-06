@@ -25,7 +25,6 @@ export const Route = createFileRoute("/api/contact")({
             { status: 400 },
           );
         }
-        // Log submission (visible in server logs). Email integration can be added later.
         console.log("[contact] new submission:", {
           name: parsed.data.name,
           email: parsed.data.email,
@@ -36,4 +35,4 @@ export const Route = createFileRoute("/api/contact")({
       },
     },
   },
-});
+} as any);
