@@ -11,7 +11,7 @@ const ContactSchema = z.object({
 export const Route = createFileRoute("/api/contact")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: async ({ request }: { request: Request }) => {
         let body: unknown;
         try {
           body = await request.json();
