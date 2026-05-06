@@ -183,16 +183,32 @@ ${heroBlock("Contact", "Let's build something great.", "Tell us about your proje
       </div>
     </div>
 
-    <form class="contact" id="contact-form" onsubmit="event.preventDefault();this.style.display='none';document.getElementById('contact-success').style.display='block';">
+    <form class="contact" id="contact-form" novalidate onsubmit="
+      event.preventDefault();
+      var f=this, btn=f.querySelector('button[type=submit]');
+      var errEl=document.getElementById('contact-error');
+      errEl.style.display='none'; errEl.textContent='';
+      btn.disabled=true; var oldText=btn.textContent; btn.textContent='Sending…';
+      var data={name:f.name.value,email:f.email.value,subject:f.subject.value,message:f.message.value};
+      fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+        .then(function(r){return r.json().then(function(j){return {ok:r.ok&&j.ok,j:j}});})
+        .then(function(res){
+          if(res.ok){ f.style.display='none'; document.getElementById('contact-success').style.display='block'; }
+          else { errEl.textContent=(res.j&&res.j.error)||'Something went wrong. Please try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent=oldText; }
+        })
+        .catch(function(){ errEl.textContent='Network error. Please check your connection and try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent=oldText; });
+      return false;
+    ">
       <div class="form-row">
-        <div><label>Your name</label><input required type="text" name="name" /></div>
-        <div><label>Email</label><input required type="email" name="email" /></div>
+        <div><label>Your name</label><input required type="text" name="name" maxlength="100" /></div>
+        <div><label>Email</label><input required type="email" name="email" maxlength="255" /></div>
       </div>
-      <div><label>Subject</label><input required type="text" name="subject" /></div>
-      <div><label>Message</label><textarea required rows="5" name="message"></textarea></div>
+      <div><label>Subject</label><input required type="text" name="subject" maxlength="200" /></div>
+      <div><label>Message</label><textarea required rows="5" name="message" maxlength="2000"></textarea></div>
+      <div id="contact-error" role="alert" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:rgba(220,60,60,.12);border:1px solid rgba(220,60,60,.4);color:#ffb4b4"></div>
       <button class="btn btn-primary" type="submit">Send message →</button>
     </form>
-    <div id="contact-success" class="success" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px">
+    <div id="contact-success" class="success" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;text-align:center">
       <div style="font-size:2rem">✓</div>
       <h3>Message sent</h3>
       <p class="muted">Thanks — we'll be in touch shortly.</p>
