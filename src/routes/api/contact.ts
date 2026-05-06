@@ -68,31 +68,89 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+// Brand tokens (from logo)
+const BRAND = {
+  navy: "#0b1a2b",
+  navyDeep: "#081424",
+  cyan: "#22b8e6",
+  cyanDark: "#1796bf",
+  ink: "#0b1a2b",
+  muted: "#5b6b80",
+  surface: "#f4f8fb",
+  border: "#e2eaf2",
+  white: "#ffffff",
+};
+const FONT_STACK = `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+
+function shell(inner: string, preheader: string) {
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${BRAND.surface};font-family:${FONT_STACK};color:${BRAND.ink};-webkit-font-smoothing:antialiased">
+  <span style="display:none!important;opacity:0;visibility:hidden;height:0;width:0;overflow:hidden">${escapeHtml(preheader)}</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.surface};padding:32px 16px">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:${BRAND.white};border:1px solid ${BRAND.border};border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(11,26,43,.06)">
+        <tr><td style="background:linear-gradient(135deg,${BRAND.navy} 0%,${BRAND.navyDeep} 100%);padding:28px 32px;border-bottom:3px solid ${BRAND.cyan}">
+          <table role="presentation" width="100%"><tr>
+            <td style="font-family:${FONT_STACK};font-size:22px;font-weight:700;letter-spacing:-.01em;color:${BRAND.white}">
+              Apo<span style="color:${BRAND.cyan}">softech</span>
+              <span style="display:block;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:#9fb4cc;margin-top:4px">Solutions</span>
+            </td>
+          </tr></table>
+        </td></tr>
+        <tr><td style="padding:36px 32px;font-family:${FONT_STACK};font-size:15px;line-height:1.6;color:${BRAND.ink}">${inner}</td></tr>
+        <tr><td style="background:${BRAND.surface};padding:20px 32px;border-top:1px solid ${BRAND.border};font-family:${FONT_STACK};font-size:12px;line-height:1.5;color:${BRAND.muted};text-align:center">
+          <strong style="color:${BRAND.navy}">Aposoftech Solutions</strong> · Nairobi, Kenya<br/>
+          <a href="tel:+254115348341" style="color:${BRAND.cyanDark};text-decoration:none">+254 115 348 341</a> ·
+          <a href="mailto:aposoftechsolutions@gmail.com" style="color:${BRAND.cyanDark};text-decoration:none">aposoftechsolutions@gmail.com</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 function confirmationHtml(name: string, subject: string, message: string) {
-  return `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#f6f8fa;padding:24px;color:#0b1a2b">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:28px;border:1px solid #e5e9f0">
-    <h2 style="margin:0 0 12px;color:#0b1a2b">Thanks for reaching out, ${escapeHtml(name)}!</h2>
-    <p style="margin:0 0 16px;line-height:1.5">We've received your message and a member of the Aposoftech Solutions team will get back to you within one business day.</p>
-    <div style="background:#f0f7fb;border-left:4px solid #22b8e6;padding:14px 16px;border-radius:6px;margin:16px 0">
-      <div style="font-size:13px;color:#55606e;margin-bottom:6px"><strong>Your subject:</strong> ${escapeHtml(subject)}</div>
-      <div style="font-size:14px;white-space:pre-wrap">${escapeHtml(message)}</div>
+  const inner = `
+    <h1 style="margin:0 0 8px;font-family:${FONT_STACK};font-size:24px;font-weight:700;letter-spacing:-.01em;color:${BRAND.navy}">
+      Thanks, ${escapeHtml(name)} — we've got your message.
+    </h1>
+    <p style="margin:0 0 24px;color:${BRAND.muted};font-size:15px;line-height:1.6">
+      A member of the Aposoftech Solutions team will respond within one business day.
+    </p>
+    <div style="background:${BRAND.surface};border:1px solid ${BRAND.border};border-left:4px solid ${BRAND.cyan};border-radius:10px;padding:18px 20px;margin:0 0 24px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:${BRAND.muted};margin-bottom:6px">Subject</div>
+      <div style="font-size:15px;font-weight:600;color:${BRAND.navy};margin-bottom:12px">${escapeHtml(subject)}</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:${BRAND.muted};margin-bottom:6px">Your message</div>
+      <div style="font-size:14px;line-height:1.6;color:${BRAND.ink};white-space:pre-wrap">${escapeHtml(message)}</div>
     </div>
-    <p style="margin:20px 0 0;font-size:13px;color:#55606e">— Aposoftech Solutions<br/>Nairobi, Kenya · +254 115 348 341</p>
-  </div></body></html>`;
+    <p style="margin:0;color:${BRAND.muted};font-size:14px;line-height:1.6">
+      Need to add something? Just reply to this email — it lands straight in our inbox.
+    </p>`;
+  return shell(inner, `We received your message — we'll be in touch within one business day.`);
 }
 
 function internalCopyHtml(d: { name: string; email: string; subject: string; message: string }) {
-  return `<!doctype html><html><body style="font-family:Arial,sans-serif;padding:20px;color:#0b1a2b">
-  <h2 style="margin:0 0 12px">New contact form submission</h2>
-  <table style="border-collapse:collapse;font-size:14px">
-    <tr><td style="padding:6px 12px 6px 0;color:#55606e"><strong>Name</strong></td><td>${escapeHtml(d.name)}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;color:#55606e"><strong>Email</strong></td><td><a href="mailto:${escapeHtml(d.email)}">${escapeHtml(d.email)}</a></td></tr>
-    <tr><td style="padding:6px 12px 6px 0;color:#55606e"><strong>Subject</strong></td><td>${escapeHtml(d.subject)}</td></tr>
-  </table>
-  <h3 style="margin:18px 0 6px">Message</h3>
-  <div style="white-space:pre-wrap;background:#f6f8fa;border:1px solid #e5e9f0;border-radius:8px;padding:14px">${escapeHtml(d.message)}</div>
-  <p style="margin-top:18px;font-size:12px;color:#55606e">Reply directly to this email to respond to ${escapeHtml(d.name)}.</p>
-  </body></html>`;
+  const row = (label: string, value: string) => `
+    <tr>
+      <td style="padding:10px 16px 10px 0;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:${BRAND.muted};vertical-align:top;width:90px">${label}</td>
+      <td style="padding:10px 0;font-size:14px;color:${BRAND.navy};font-weight:500">${value}</td>
+    </tr>`;
+  const inner = `
+    <div style="display:inline-block;background:${BRAND.cyan};color:${BRAND.navyDeep};font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px;margin-bottom:16px">New lead</div>
+    <h1 style="margin:0 0 24px;font-family:${FONT_STACK};font-size:22px;font-weight:700;letter-spacing:-.01em;color:${BRAND.navy}">
+      New contact form submission
+    </h1>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${BRAND.border};border-bottom:1px solid ${BRAND.border};margin:0 0 20px">
+      ${row("Name", escapeHtml(d.name))}
+      ${row("Email", `<a href="mailto:${escapeHtml(d.email)}" style="color:${BRAND.cyanDark};text-decoration:none;font-weight:600">${escapeHtml(d.email)}</a>`)}
+      ${row("Subject", escapeHtml(d.subject))}
+    </table>
+    <div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:${BRAND.muted};margin:0 0 8px">Message</div>
+    <div style="background:${BRAND.surface};border:1px solid ${BRAND.border};border-radius:10px;padding:18px 20px;font-size:14px;line-height:1.6;color:${BRAND.ink};white-space:pre-wrap">${escapeHtml(d.message)}</div>
+    <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};line-height:1.5">
+      Hit reply to respond directly to <strong style="color:${BRAND.navy}">${escapeHtml(d.name)}</strong>.
+    </p>`;
+  return shell(inner, `New contact from ${d.name}: ${d.subject}`);
 }
 
 export const Route = createFileRoute("/api/contact")({
